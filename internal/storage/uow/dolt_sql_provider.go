@@ -547,15 +547,16 @@ func (b *bootstrapPreparer) prepare(ctx context.Context, conn *sql.Conn) (*schem
 	return b.heal, nil
 }
 
-func buildDSN(ep proxy.Endpoint, database, user, password, tlsConfigName string) string {
+func buildDSN(ep proxy.Endpoint, database, user, password, tlsConfigName string, allowCleartextPasswords bool) string {
 	return util.DoltServerDSN{
-		Host:            ep.Host,
-		Port:            ep.Port,
-		User:            user,
-		Password:        password,
-		Database:        database,
-		TLSConfigName:   tlsConfigName,
-		ClientFoundRows: true,
+		Host:                    ep.Host,
+		Port:                    ep.Port,
+		User:                    user,
+		Password:                password,
+		Database:                database,
+		TLSConfigName:           tlsConfigName,
+		ClientFoundRows:         true,
+		AllowCleartextPasswords: allowCleartextPasswords,
 	}.String()
 }
 
@@ -582,8 +583,8 @@ func openDB(ctx context.Context, dsn string) (*sql.DB, error) {
 	return conn, nil
 }
 
-func openAndInitSchema(ctx context.Context, ep proxy.Endpoint, database, rootUser, rootPassword, tlsConfigName string, teamServer bool, expectedProjectID string, opts providerOptions) (UnitOfWorkProvider, error) {
-	initDB, err := openDB(ctx, buildDSN(ep, "", rootUser, rootPassword, tlsConfigName))
+func openAndInitSchema(ctx context.Context, ep proxy.Endpoint, database, rootUser, rootPassword, tlsConfigName string, allowCleartextPasswords bool, teamServer bool, expectedProjectID string, opts providerOptions) (UnitOfWorkProvider, error) {
+	initDB, err := openDB(ctx, buildDSN(ep, "", rootUser, rootPassword, tlsConfigName, allowCleartextPasswords))
 	if err != nil {
 		return nil, err
 	}
@@ -607,7 +608,7 @@ func openAndInitSchema(ctx context.Context, ep proxy.Endpoint, database, rootUse
 		return nil, fmt.Errorf("uow: close init db: %w", err)
 	}
 
-	dbConn, err := openDB(ctx, buildDSN(ep, database, rootUser, rootPassword, tlsConfigName))
+	dbConn, err := openDB(ctx, buildDSN(ep, database, rootUser, rootPassword, tlsConfigName, allowCleartextPasswords))
 	if err != nil {
 		return nil, err
 	}
