@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`dolt_server_allow_cleartext_password` / `BEADS_DOLT_SERVER_ALLOW_CLEARTEXT_PASSWORD`
+  permits the `mysql_clear_password` auth plugin some MySQL-protocol proxies
+  (e.g. an SSH-bastion listener) demand.** Only takes effect together with
+  `dolt_server_tls` / `BEADS_DOLT_SERVER_TLS=1`; refused otherwise.
+
 ## [1.3.0] - 2026-09-15
 
 The first tested release off `main` since the 1.1 line. [1.2.2] was a recovery
